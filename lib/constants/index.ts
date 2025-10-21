@@ -17,3 +17,20 @@ export const SIGN_UP_DEFAULT_VALUES = {
   password: "",
   confirmPassword: "",
 };
+export const SHIPPING_ADDRESS_DEFAULT_VALUES = {
+  fullName: "",
+  streetAddress: "",
+  city: "",
+  postalCode: "",
+  country: "",
+  lat: 0,
+  lng: 0,
+};
+
+export const PAYMENT_METHODS = process.env.PAYMENT_METHODS
+  ? process.env.PAYMENT_METHODS.split(", ")
+  : ["PayPal", "Stripe", "CashOnDelivery"];
+export const DEFAULT_PAYMENT_METHOD =
+  process.env.DEFAULT_PAYMENT_METHOD || "PayPal";
+
+export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
