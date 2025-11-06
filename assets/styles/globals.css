@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -268,4 +268,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Uploadthing button text override */
+html.dark .upload-field .text-white {
+  color: #fff !important;
+}
+/* Uploadthing button text override */
+.upload-field .text-white {
+  color: #000 !important;
 }
