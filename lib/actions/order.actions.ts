@@ -11,7 +11,7 @@ import { CartItem, PaymentResult } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
-import { Decimal, OrderWhereInput } from "@prisma/client/runtime/library";
+import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "../generated/prisma";
 
 // Create order and create order item
