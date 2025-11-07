@@ -3,9 +3,10 @@ import type { Adapter } from "next-auth/adapters";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compareSync } from "bcrypt-ts-edge";
+import { compare } from "./lib/encrypt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { authConfig } from "./auth.config";
 
 export const config: NextAuthConfig = {
   pages: {
@@ -13,7 +14,7 @@ export const config: NextAuthConfig = {
     error: "/sign-in",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -33,7 +34,7 @@ export const config: NextAuthConfig = {
         });
 
         if (user && user.password) {
-          const isMatch = compareSync(
+          const isMatch = await compare(
             credentials.password as string,
             user.password
           );
@@ -54,6 +55,7 @@ export const config: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async session({ session, user, trigger, token }: any) {
       // Set the user data from token
@@ -158,6 +160,6 @@ export const config: NextAuthConfig = {
       } else return true;
     },
   },
-} satisfies NextAuthConfig;
+};
 
 export const { handlers, signIn, signOut, auth } = NextAuth(config);

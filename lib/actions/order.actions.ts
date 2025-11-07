@@ -7,12 +7,13 @@ import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
 import { insertOrderSchema } from "../validators";
 import { prisma } from "@/db/prisma";
-import { CartItem, PaymentResult } from "@/types";
+import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "../generated/prisma";
+import { sendPurchaseReceipt } from "@/email";
 
 // Create order and create order item
 export async function createOrder() {
@@ -211,7 +212,7 @@ export async function approvePaypalOrder(
 }
 
 // Update order to paid
-async function updateOrderToPaid({
+export async function updateOrderToPaid({
   orderId,
   paymentResult,
 }: {
@@ -251,7 +252,7 @@ async function updateOrderToPaid({
   });
 
   // Get Updated order after transaction
-  const updatedOrder = prisma.order.findFirst({
+  const updatedOrder = await prisma.order.findFirst({
     where: { id: orderId },
     include: {
       orderitems: true,
@@ -262,6 +263,14 @@ async function updateOrderToPaid({
   });
 
   if (!updatedOrder) throw new Error("Order could not be found");
+
+  sendPurchaseReceipt({
+    order: {
+      ...updatedOrder,
+      shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+      paymentResult: updatedOrder.paymentResult as PaymentResult,
+    },
+  });
 }
 
 // Get user's orders
